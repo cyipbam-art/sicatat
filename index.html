@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SiCatat</title><meta name="theme-color" content="#0B2B26">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--sb:#0B2B26;--g:#0FA968;--bg:#F3F6F4;--bd:#E5EBE8;--t:#0F1F1B;--m:#6B7280}
+*{box-sizing:border-box;margin:0}
+body{font:14px 'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--t);font-variant-numeric:tabular-nums}
+#side{position:fixed;inset:0 auto 0 0;width:260px;background:var(--sb);color:#cfe3da;display:flex;flex-direction:column;padding:20px 14px;overflow:auto}
+#main{margin-left:260px;padding:28px;max-width:1180px}
+.nav a{display:flex;gap:10px;padding:12px 14px;border-radius:14px;cursor:pointer;margin:2px 0;border:1px solid transparent}
+.nav a.on{background:#0F3D33;border-color:#1F7A5A;color:#fff}
+.lg{display:flex;align-items:center;gap:10px;color:#fff;font-size:20px;font-weight:800;margin:0 8px 22px}.lg svg{width:40px}.lg b{color:#34D399}
+#bn{display:none}
+.c{background:#fff;border:1px solid var(--bd);border-radius:24px;padding:20px;margin-bottom:16px}
+.hero{background:linear-gradient(135deg,#0F5C45,#0B4A3A);color:#fff;border:0}.hero small{opacity:.8}
+.big{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:6px 0}
+.g{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}.g .c{margin:0}
+.hd{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px}.hd h2{font-size:22px;font-weight:800}
+.b{background:var(--g);color:#fff;border:0;border-radius:12px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer}
+.b.o{background:#fff;color:var(--t);border:1px solid var(--bd)}.b.s{padding:6px 10px;font-size:12px}.b.r{color:#EF4444}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd)}.row:last-child{border:0}
+.row>div:first-child{min-width:0;flex:1}.mu{color:var(--m);font-size:12px}.in{color:#0a8a53;font-weight:700}.out{color:#dc2626;font-weight:700}
+.pill{display:inline-block;border-radius:99px;padding:8px 14px;background:#fff;border:1px solid var(--bd);cursor:pointer;margin:0 6px 8px 0;font-weight:500}.pill.on{background:var(--g);color:#fff;border-color:var(--g)}
+.bar{height:8px;background:var(--bg);border-radius:9px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--g)}
+input,select{width:100%;height:44px;border:1px solid var(--bd);background:var(--bg);border-radius:12px;padding:0 12px;font:inherit;margin:4px 0 10px}
+label{font-weight:500;font-size:13px}
+#md{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:50;backdrop-filter:blur(4px)}#md.on{display:flex}
+.sh{background:#fff;width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:20px;max-height:90vh;overflow:auto}.sh h3{margin-bottom:10px}
+.sh .row.f{gap:10px;border:0}.sh .row.f>*{flex:1}
+#ts{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#0B2B26;color:#fff;padding:10px 18px;border-radius:99px;z-index:99;display:none}
+.lw{min-height:100vh;display:grid;place-items:center;padding:16px;background:var(--sb)}.lw .c{width:100%;max-width:400px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.cal div{padding:8px 0;border-radius:10px;font-size:13px}.cal .d{background:#E6F6EE;font-weight:700}
+@media(max-width:820px){#side{display:none}#main{margin:0;padding:16px 14px calc(110px + env(safe-area-inset-bottom))}
+#bn{display:flex;position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));height:64px;background:#ffffffd9;backdrop-filter:blur(16px);border:1px solid var(--bd);border-radius:24px;justify-content:space-around;align-items:center;z-index:40;box-shadow:0 8px 24px #0002}
+#bn a{display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--m);gap:2px;cursor:pointer}#bn a.on{color:var(--g);font-weight:700}#bn a span{font-size:20px}
+#bn .fab{background:var(--g);color:#fff;width:54px;height:54px;border-radius:50%;justify-content:center;font-size:28px;margin-top:-26px;box-shadow:0 6px 16px #0FA96866}
+.big{font-size:28px}}
+</style></head><body><div id="app"></div><div id="md"></div><div id="ts"></div>
+<script type="module">
+// KONFIGURASI APLIKASI
+const IS_PREVIEW = true; // Ubah menjadi false SAAT DEPLOY / PUBLISH agar terhubung murni ke Firebase tanpa data dummy
+
+// PASTE FIREBASE CONFIG ANDA DI SINI
+const firebaseConfig = {
+  apiKey: "AIzaSyBSUHpwYvkO1ADgS-KfoUVa8UIZe9_49Pg",
+  authDomain: "sicatat-f729f.firebaseapp.com",
+  projectId: "sicatat-f729f",
+  storageBucket: "sicatat-f729f.firebasestorage.app",
+  messagingSenderId: "854873564106",
+  appId: "1:854873564106:web:e4f9e930e749728b13a533"
+};
+
+const $=s=>document.querySelector(s),rp=n=>(n<0?'-':'')+'Rp '+Math.round(Math.abs(n)).toLocaleString('id-ID');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>crypto.randomUUID().replace(/-/g,'').slice(0,20),today=()=>new Date().toISOString().slice(0,10);
+const sum=(a,f)=>a.reduce((s,x)=>s+(+f(x)||0),0),pc=(a,b)=>b>0?Math.min(100,Math.round(a/b*100)):0;
+const COLS=['users','wallets','categories','budgets','transactions','savings','debts','receivables','recurring','quickEntries','events','activityLogs'];
+const D={},S={u:null,p:'dash',m:today().slice(0,7),cm:today().slice(0,7),lm:'admin',ct:'cal',cc:'kredit',rt:'lap',pt:'users',hide:false,q:''};
+COLS.forEach(c=>D[c]=[]);let FB={};
+const ICON='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="40" fill="#0F5C45"/><rect x="40" y="32" width="80" height="96" rx="12" fill="#fff"/><rect x="54" y="48" width="40" height="6" rx="3" fill="#CFE9DD"/><rect x="54" y="64" width="28" height="6" rx="3" fill="#CFE9DD"/><path d="M56 98L68 110L92 80" fill="none" stroke="#0FA968" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="128" cy="124" r="27" fill="#FCD34D"/><circle cx="128" cy="124" r="19" fill="none" stroke="#D99A0B" stroke-width="2.5"/></svg>';
+(()=>{const u='data:image/svg+xml,'+encodeURIComponent(ICON),mf={name:'SiCatat',short_name:'SiCatat',start_url:'.',display:'standalone',background_color:'#0B2B26',theme_color:'#0B2B26',icons:[{src:u,sizes:'any',type:'image/svg+xml'}]};
+ [['manifest','data:application/manifest+json,'+encodeURIComponent(JSON.stringify(mf))],['icon',u]].forEach(([r,h])=>{const l=document.createElement('link');l.rel=r;l.href=h;document.head.append(l)});
+ try{const w=URL.createObjectURL(new Blob(["self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('fetch',()=>{});"],{type:'text/javascript'}));navigator.serviceWorker?.register(w).catch(()=>{})}catch(e){}})();
+
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+async function hp(pw,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:150000,hash:'SHA-256'},k,256))}
+const toast=t=>{const e=$('#ts');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2500)};
+const m=n=>S.hide?'Rp ••••••':rp(n),me=()=>S.u.id||'admin',isA=()=>S.u.role=='admin';
+const myW=()=>D.wallets.filter(w=>w.aktif!==false&&(S.u.role!='anak'||w.ownerId==S.u.id));
+const mySav=()=>D.savings.filter(s=>S.u.role!='anak'||s.shared||s.ownerId==me());
+const T=()=>D.transactions.filter(x=>S.u.role!='anak'||x.createdBy==me()).sort((a,b)=>b.tanggal.localeCompare(a.tanggal));
+const cat=id=>D.categories.find(c=>c.id==id);
+
+async function commit(ops,log){
+ if(log&&S.u)ops.push({k:'set',c:'activityLogs',id:uid(),d:{aksi:log,oleh:S.u.nama,waktu:new Date().toISOString()}});
+ if(IS_PREVIEW){for(const o of ops){const a=D[o.c],i=a.findIndex(x=>x.id===o.id);
+  if(o.k=='del'){if(i>=0)a.splice(i,1)}else if(o.k=='inc'){if(i>=0)a[i][o.f]=(a[i][o.f]||0)+o.n}else if(i>=0)Object.assign(a[i],o.d);else a.push({...o.d,id:o.id})}}
+ else{const b=FB.writeBatch(FB.db);for(const o of ops){const r=FB.doc(FB.db,o.c,o.id);
+  if(o.k=='del')b.delete(r);else if(o.k=='inc')b.update(r,{[o.f]:FB.increment(o.n)});else b.set(r,o.d,{merge:true})}
+  await b.commit()}
+ render()}
+const fx=(t,k)=>{const n=t.nominal*k,w=(c,i,f,x)=>({k:'inc',c,id:i,f,n:x}),r=[],T=t.tipe;
+ if(['pemasukan','tarik_tabungan','koreksi'].includes(T))r.push(w('wallets',t.walletId,'saldo',n));
+ if(['pengeluaran','transfer','setor_tabungan'].includes(T))r.push(w('wallets',t.walletId,'saldo',-n));
+ if(T=='transfer')r.push(w('wallets',t.toWalletId,'saldo',n));
+ if(T=='setor_tabungan')r.push(w('savings',t.savingId,'terkumpul',n));
+ if(T=='tarik_tabungan')r.push(w('savings',t.savingId,'terkumpul',-n));
+ if(t.refType=='debt')r.push(w('debts',t.refId,'sisaHutang',-n),w('debts',t.refId,'terbayarKe',k));
+ if(t.refType=='receivable')r.push(w('receivables',t.refId,'terbayar',n));
+ return r};
+const allT=async()=>IS_PREVIEW?D.transactions:(await FB.getDocs(FB.collection(FB.db,'transactions'))).docs.map(d=>({...d.data(),id:d.id}));
+
+function modal(h){$('#md').innerHTML=`<div class="sh">${h}</div>`;$('#md').classList.add('on')}
+const closeM=()=>$('#md').classList.remove('on');
+function form(title,fs,val,onsave){
+ const h=fs.map(([k,l,t,o])=>`<label>${l}</label>`+(t=='select'?`<select name="${k}">${(typeof o=='function'?o():o).map(([v,n])=>`<option value="${v}" ${val[k]==v?'selected':''}>${n}</option>`).join('')}</select>`:`<input name="${k}" type="${t||'text'}" value="${esc(val[k])}" ${t=='number'?'inputmode="decimal" step="any"':''}>`)).join('');
+ modal(`<h3>${title}</h3><form id="fm">${h}<div class="row f"><button type="button" class="b o" onclick="A.close()">Batal</button><button class="b">Simpan</button></div></form>`);
+ $('#fm').onsubmit=async e=>{e.preventDefault();const o={};fs.forEach(([k,,t])=>{const v=e.target[k].value;o[k]=t=='number'?+v||0:v});try{await onsave(o);closeM()}catch(x){toast('Gagal menyimpan')}}}
+const wo=()=>myW().map(w=>[w.id,w.nama]),so=()=>mySav().map(s=>[s.id,s.nama]),co=t=>()=>D.categories.filter(c=>!t||c.tipe==t).map(c=>[c.id,(c.ikon||'')+' '+c.nama]);
+const yn=[['ya','Ya'],['tidak','Tidak']],tp=[['pemasukan','Pemasukan'],['pengeluaran','Pengeluaran']];
+const CF={
+ wallets:['Dompet',[['nama','Nama dompet'],['tipe','Tipe','select',[['tunai','Tunai'],['bank','Bank'],['ewallet','E-Wallet']]],['saldoAwal','Saldo awal (Rp)','number'],['ownerId','Pemilik','select',()=>[['','Bersama'],...D.users.map(u=>[u.id,u.nama])]]],(o,old)=>({aktif:true,saldo:old?(old.saldo||0)+o.saldoAwal-old.saldoAwal:o.saldoAwal})],
+ categories:['Kategori',[['nama','Nama'],['tipe','Tipe','select',tp],['ikon','Ikon (emoji)']]],
+ budgets:['Anggaran',[['categoryId','Kategori','select',co('pengeluaran')],['limitBulanan','Batas per bulan (Rp)','number']]],
+ savings:['Tabungan',[['nama','Nama tabungan'],['jenis','Jenis','select',[['target','Bertarget'],['bebas','Bebas'],['darurat','Dana Darurat']]],['target','Target (Rp, 0 jika bebas)','number'],['deadline','Tenggat','date'],['disimpanDi','Disimpan di'],['shared','Dibagikan ke anggota?','select',yn]],(o,old)=>({shared:o.shared=='ya',terkumpul:old?old.terkumpul:0,ownerId:old?old.ownerId:me()})],
+ debts:['Hutang',[['nama','Nama barang / hutang'],['kreditur','Kreditur / leasing'],['jenis','Jenis','select',[['kredit_barang','Kredit barang'],['pinjaman','Pinjaman'],['bnpl','BNPL'],['kpr','KPR']]],['hargaBarang','Harga barang / pokok (Rp)','number'],['dp','Uang muka / DP (Rp)','number'],['angsuranPerBulan','Angsuran per bulan (Rp)','number'],['tenor','Tenor (bulan)','number'],['tanggalMulai','Tanggal mulai','date'],['tglJatuhTempo','Jatuh tempo tiap tanggal','number']],(o,old)=>{const pokok=o.hargaBarang-o.dp,tb=o.angsuranPerBulan*o.tenor+o.dp,bg=tb-o.hargaBarang;return{pokok,totalBayar:tb,totalBunga:bg,bungaFlatPerTahun:pokok&&o.tenor?+(bg/pokok/(o.tenor/12)*100).toFixed(2):0,terbayarKe:old?old.terbayarKe:0,sisaHutang:old?old.sisaHutang+(o.angsuranPerBulan*o.tenor-old.angsuranPerBulan*old.tenor):o.angsuranPerBulan*o.tenor}}],
+ receivables:['Piutang',[['peminjam','Nama peminjam'],['keterangan','Keterangan'],['nominal','Nominal (Rp)','number'],['tanggalPinjam','Tanggal pinjam','date'],['jatuhTempo','Jatuh tempo','date']],(o,old)=>({terbayar:old?old.terbayar:0})],
+ recurring:['Transaksi berulang',[['judul','Judul (mis. Listrik)'],['tipe','Tipe','select',tp],['nominal','Nominal (Rp)','number'],['categoryId','Kategori','select',co()],['walletId','Dompet','select',wo],['tanggalBerulang','Tanggal tiap bulan (1-28)','number']],()=>({aktif:true})],
+ quickEntries:['Transaksi cepat',[['judul','Judul (mis. Bensin)'],['tipe','Tipe','select',tp],['nominal','Nominal (Rp)','number'],['categoryId','Kategori','select',co()],['walletId','Dompet','select',wo]]],
+ events:['Pengingat',[['judul','Judul'],['tanggal','Tanggal','date'],['catatan','Catatan']]]};
+const A={close:closeM,
+ go(p){S.p=p;closeM();render();scrollTo(0,0)},set(k,v){S[k]=v;render()},
+ edit(c,id,pf){const[t,fs,pre]=CF[c],old=D[c].find(x=>x.id==id)||pf||{};form((id?'Ubah ':'Tambah ')+t,fs,old,async o=>{const d={...o,...(pre?pre(o,id&&old):{})};await commit([{k:'set',c,id:id||(c=='budgets'?o.categoryId:uid()),d}],`${id?'Ubah':'Tambah'} ${t}: ${o.nama||o.judul||o.peminjam||''}`)})},
+ async del(c,id){if(!confirm('Hapus data ini?'))return;const o=D[c].find(x=>x.id==id),ops=[{k:'del',c,id}];if(c=='transactions')ops.push(...fx(o,-1));await commit(ops,'Hapus '+c)},
+ trx(tipe,id,pf){const old=D.transactions.find(x=>x.id==id)||{tanggal:today(),walletId:myW()[0]?.id,...pf};tipe=old.tipe||tipe;
+  if(!myW().length)return toast('Buat dompet dulu di menu Dompet');
+  const fs=[['nominal',tipe=='koreksi'?'Selisih (Rp)':'Nominal (Rp)','number'],['tanggal','Tanggal','date'],['walletId',tipe=='transfer'||tipe.endsWith('tabungan')?'Dari / ke dompet':'Dompet','select',wo]];
+  if(tipe=='pemasukan'||tipe=='pengeluaran')fs.push(['categoryId','Kategori','select',co(tipe)]);
+  if(tipe=='transfer')fs.push(['toWalletId','Ke dompet','select',wo]);
+  if(tipe.endsWith('tabungan'))fs.push(['savingId','Tabungan','select',so]);
+  fs.push(['catatan','Catatan']);
+  form((id?'Ubah ':'Catat ')+tipe.replace('_',' '),fs,old,async o=>{if(!o.nominal)throw 0;const n={...old,...o,tipe,createdBy:old.createdBy||me(),createdByNama:old.createdByNama||S.u.nama},nid=old.id||uid();delete n.id;
+   await commit([...(old.id?fx(old,-1):[]),{k:'set',c:'transactions',id:nid,d:n},...fx(n,1)],`${old.id?'Ubah':'Catat'} ${tipe} ${rp(o.nominal)}`)})},
+ add(){modal(`<h3>Catat apa?</h3>${[['pengeluaran','💸 Pengeluaran'],['pemasukan','💰 Pemasukan'],['transfer','🔁 Transfer antar dompet'],['setor_tabungan','🐷 Setor ke tabungan'],['tarik_tabungan','🏧 Tarik dari tabungan']].map(([t,l])=>`<button class="b o" style="width:100%;margin-bottom:8px;text-align:left" onclick="A.trx('${t}')">${l}</button>`).join('')}`)},
+ menu(){modal(`<h3>Menu</h3>${menu().map(([p,i,l])=>`<button class="b o" style="width:100%;margin-bottom:8px;text-align:left" onclick="A.go('${p}')">${i} ${l}</button>`).join('')}<button class="b o r" style="width:100%" onclick="A.out()">Keluar akun</button>`)},
+ pay(c,id){const o=D[c].find(x=>x.id==id),d=c=='debts';form(d?'Bayar angsuran':'Terima cicilan',[['nominal','Nominal (Rp)','number'],['tanggal','Tanggal','date'],['walletId','Dompet','select',wo]],{nominal:d?o.angsuranPerBulan:o.nominal-o.terbayar,tanggal:today(),walletId:myW()[0]?.id},async x=>{if(!x.nominal)throw 0;const t={...x,tipe:d?'pengeluaran':'pemasukan',catatan:(d?'Angsuran ':'Cicilan piutang ')+(o.nama||o.peminjam),refType:d?'debt':'receivable',refId:id,createdBy:me(),createdByNama:S.u.nama};await commit([{k:'set',c:'transactions',id:uid(),d:t},...fx(t,1)],'Bayar '+(o.nama||o.peminjam))})},
+ kor(id){const w=D.wallets.find(x=>x.id==id);form('Koreksi saldo '+esc(w.nama),[['real','Saldo sebenarnya (Rp)','number']],{real:w.saldo},async o=>{const d=o.real-w.saldo;if(!d)return;const t={nominal:d,tanggal:today(),walletId:id,tipe:'koreksi',catatan:'Koreksi saldo',createdBy:me(),createdByNama:S.u.nama};await commit([{k:'set',c:'transactions',id:uid(),d:t},...fx(t,1)],'Koreksi saldo '+w.nama)})},
+ async quick(id){const q=D.quickEntries.find(x=>x.id==id),t={nominal:q.nominal,tanggal:today(),walletId:q.walletId,categoryId:q.categoryId,tipe:q.tipe,catatan:q.judul,createdBy:me(),createdByNama:S.u.nama};await commit([{k:'set',c:'transactions',id:uid(),d:t},...fx(t,1)],'Catat cepat '+q.judul);toast('Tercatat')},
+ async rec(id){const q=D.recurring.find(x=>x.id==id),t={nominal:q.nominal,tanggal:today(),walletId:q.walletId,categoryId:q.categoryId,tipe:q.tipe,catatan:q.judul,createdBy:me(),createdByNama:S.u.nama};await commit([{k:'set',c:'transactions',id:uid(),d:t},...fx(t,1),{k:'set',c:'recurring',id,d:{terakhirDicatat:today().slice(0,7)}}],'Catat berulang '+q.judul)},
+ async seed(){const P=[['Gaji','pemasukan','💼'],['Usaha','pemasukan','🏪'],['Lainnya','pemasukan','💰'],['Makan','pengeluaran','🍽️'],['Transport','pengeluaran','🚗'],['Belanja','pengeluaran','🛒'],['Tagihan','pengeluaran','💡'],['Pendidikan','pengeluaran','🎓'],['Kesehatan','pengeluaran','💊'],['Hiburan','pengeluaran','🎬'],['Lainnya','pengeluaran','📦']];await commit(P.map(([nama,tipe,ikon])=>({k:'set',c:'categories',id:uid(),d:{nama,tipe,ikon}})),'Buat kategori standar')},
+ user(id){const o=D.users.find(x=>x.id==id)||{aktif:true},fs=[...(id?[]:[['username','Username (huruf kecil/angka)']]),['nama','Nama'],['role','Peran','select',[['dewasa','Dewasa'],['anak','Anak']]],['password',id?'Password baru (kosongkan jika tidak diubah)':'Password (min 8 karakter)','password'],['aktif','Aktif?','select',yn]];
+  form(id?'Ubah anggota':'Tambah anggota',fs,{...o,aktif:o.aktif?'ya':'tidak'},async x=>{const un=id||x.username.trim().toLowerCase();if(!/^[a-z0-9_]{3,20}$/.test(un))throw toast('Username tidak valid');if((!id||x.password)&&x.password.length<8)throw toast('Password minimal 8 karakter');
+   const d={nama:x.nama,role:x.role,aktif:x.aktif=='ya'};if(x.password){d.salt=uid();d.passHash=await hp(x.password,d.salt)}if(!id)d.createdAt=new Date().toISOString();await commit([{k:'set',c:'users',id:un,d}],'Anggota '+un)})},
+ pw(){form('Ganti password',[['lama','Password lama','password'],['baru','Password baru (min 8)','password']],{},async x=>{const u=IS_PREVIEW?D.users.find(a=>a.id==S.u.id):(await FB.getDoc(FB.doc(FB.db,'users',S.u.id))).data();if(u.passHash!=await hp(x.lama,u.salt)||x.baru.length<8)throw toast('Password lama salah / baru terlalu pendek');const salt=uid();await commit([{k:'set',c:'users',id:S.u.id,d:{salt,passHash:await hp(x.baru,salt)}}]);toast('Password diganti')})},
+ async recalc(){const ts=await allT(),acc={};const g=(c,i,f,b)=>acc[c+'|'+i+'|'+f]??={c,id:i,f,v:b};
+  D.wallets.forEach(w=>g('wallets',w.id,'saldo',w.saldoAwal||0));D.savings.forEach(s=>g('savings',s.id,'terkumpul',0));D.debts.forEach(d=>{g('debts',d.id,'sisaHutang',d.angsuranPerBulan*d.tenor);g('debts',d.id,'terbayarKe',0)});D.receivables.forEach(r=>g('receivables',r.id,'terbayar',0));
+  ts.forEach(t=>fx(t,1).forEach(o=>{const a=acc[o.c+'|'+o.id+'|'+o.f];if(a)a.v+=o.n}));
+  await commit(Object.values(acc).map(a=>({k:'set',c:a.c,id:a.id,d:{[a.f]:a.v}})),'Hitung ulang saldo');toast('Saldo dihitung ulang')},
+ dl(name,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click()},
+ async csv(){const ts=await allT();A.dl('transaksi-sicatat.csv',['tanggal,tipe,nominal,kategori,dompet,catatan,oleh',...ts.map(t=>[t.tanggal,t.tipe,t.nominal,cat(t.categoryId)?.nama||'',D.wallets.find(w=>w.id==t.walletId)?.nama||'',t.catatan||'',t.createdByNama||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','))].join('\n'),'text/csv')},
+ async bak(){const o={...D,transactions:await allT()};delete o.users;A.dl('backup-sicatat.json',JSON.stringify(o),'application/json')},
+ async login(e){e.preventDefault();const a=e.target.u.value.trim().toLowerCase(),p=e.target.p.value;
+  try{if(S.lm=='admin'){if(IS_PREVIEW){if(a=='admin@sicatat.id'&&p=='admin123')return start({nama:'Ayah (Admin)',role:'admin'});throw 0}await FB.signIn(FB.auth,a,p)}
+   else{let u;if(IS_PREVIEW)u=D.users.find(x=>x.id==a);else{const s=await FB.getDoc(FB.doc(FB.db,'users',a));u=s.exists()?{...s.data(),id:s.id}:null}
+    if(!u||!u.aktif||u.passHash!=await hp(p,u.salt))throw 0;const U={id:u.id,nama:u.nama,role:u.role};
+    if(!IS_PREVIEW){const t=uid()+uid();await FB.setDoc(FB.doc(FB.db,'sessions',t),{...U,userId:u.id,expiresAt:Date.now()+30*864e5});localStorage.setItem('sicatat_session',t);S.tok=t}start(U)}}
+  catch(x){toast('Username atau password salah')}},
+ async out(){if(!IS_PREVIEW){if(isA())await FB.signOut(FB.auth);else{try{await FB.deleteDoc(FB.doc(FB.db,'sessions',S.tok))}catch(e){}localStorage.removeItem('sicatat_session')}}S.u=null;closeM();render()},
+ calc(){const v=i=>+($('#'+i)?.value)||0;let h='';
+  if(S.cc=='kredit'){const P=v('h')-v('d'),tb=v('a')*v('t')+v('d'),bg=tb-v('h');h=`<div class="big">${rp(tb)}</div><div class="mu">Total cicilan ${rp(v('a')*v('t'))} + DP ${rp(v('d'))}</div><div class="row"><span>Total bunga</span><b>${rp(bg)}</b></div><div class="row"><span>Suku bunga flat</span><b>${P>0&&v('t')?(bg/P*100).toFixed(2)+'% ('+(bg/P/(v('t')/12)*100).toFixed(2)+'% / thn)':'-'}</b></div><div class="row"><span>Pokok pinjaman</span><b>${rp(P)}</b></div><button class="b" style="width:100%;margin-top:12px" onclick="A.toDebt()">Catat hasil simulasi ke Hutang</button>`}
+  if(S.cc=='bunga'){const P=v('h'),r=v('r'),t=v('t'),fl=P*r/100*t/12,af=t?(P+fl)/t:0,i=r/1200,ae=t?(i?P*i/(1-Math.pow(1+i,-t)):P/t):0;h=`<div class="row"><span>Flat: angsuran / bln</span><b>${rp(af)}</b></div><div class="row"><span>Flat: total bunga</span><b>${rp(fl)}</b></div><div class="row"><span>Efektif: angsuran / bln</span><b>${rp(ae)}</b></div><div class="row"><span>Efektif: total bunga</span><b>${rp(ae*t-P)}</b></div><div class="mu">Selisih bunga flat vs efektif: ${rp(fl-(ae*t-P))}</div>`}
+  if(S.cc=='lunas'){const sim=(P,r,a)=>{let n=0,tb=0;while(P>0&&n<600){const b=P*r/1200;if(a<=b)return null;tb+=b;P=P+b-a;n++}return{n,tb}},a=sim(v('h'),v('r'),v('a')),b=sim(v('h'),v('r'),v('a')+v('x'));h=a&&b?`<div class="row"><span>Tanpa tambahan</span><b>${a.n} bln · bunga ${rp(a.tb)}</b></div><div class="row"><span>Dengan tambahan</span><b>${b.n} bln · bunga ${rp(b.tb)}</b></div><div class="big">Hemat ${rp(a.tb-b.tb)}</div><div class="mu">Lunas ${a.n-b.n} bulan lebih cepat</div>`:'<div class="mu">Isi sisa pokok, bunga efektif, dan angsuran (angsuran harus lebih besar dari bunga bulanan).</div>'}
+  $('#cr').innerHTML=h},
+ toDebt(){const v=i=>+($('#'+i).value)||0;S.p='debt';render();A.edit('debts',null,{nama:$('#n')?.value||'',hargaBarang:v('h'),dp:v('d'),angsuranPerBulan:v('a'),tenor:v('t'),tanggalMulai:today()})}};
+window.A=A;
+
+const MENU=[['dash','📊','Dashboard'],['trx','🧾','Riwayat Transaksi'],['debt','💳','Hutang'],['rec','🤝','Piutang'],['sav','🐷','Tabungan'],['wal','👛','Dompet & Rekening'],['cal','🗓️','Kalender & Kalkulator'],['rep','📈','Laporan & Pengaturan']];
+const menu=()=>MENU.filter(x=>S.u.role!='anak'||!['debt','rec'].includes(x[0]));
+const hd=(t,b='')=>`<div class="hd"><h2>${t}</h2><div>${b}</div></div>`;
+const btn=(l,f,c='')=>`<button class="b s ${c}" onclick="${f}">${l}</button>`;
+const empty=t=>`<div class="mu" style="padding:18px;text-align:center">${t}</div>`;
+const kw=()=>`<div><span class="pill ${S.p=='debt'?'on':''}" onclick="A.go('debt')">Hutang</span><span class="pill ${S.p=='rec'?'on':''}" onclick="A.go('rec')">Piutang</span></div>`;
+const trxRow=t=>{const c=cat(t.categoryId),ic=c?c.ikon:{transfer:'🔁',setor_tabungan:'🐷',tarik_tabungan:'🏧',koreksi:'⚖️'}[t.tipe]||'💵',pos=['pemasukan','tarik_tabungan'].includes(t.tipe)||(t.tipe=='koreksi'&&t.nominal>0),own=isA()||t.createdBy==me();
+ return`<div class="row"><div>${ic||'💵'} <b>${esc(t.catatan||c?.nama||t.tipe)}</b><div class="mu">${t.tanggal} · ${esc(D.wallets.find(w=>w.id==t.walletId)?.nama||'-')} · ${esc(t.createdByNama||'')}</div></div><div style="text-align:right"><div class="${t.tipe=='transfer'?'':pos?'in':'out'}">${pos?'+':t.tipe=='transfer'?'':'-'}${rp(Math.abs(t.nominal))}</div>${own&&!t.refType?btn('Ubah',`A.trx('','${t.id}')`,'o'):''}${isA()?' '+btn('Hapus',`A.del('transactions','${t.id}')`,'o r'):''}</div></div>`};
+const nextDue=d=>{const n=new Date(),s=new Date(n.getFullYear(),n.getMonth(),n.getDate());let x=new Date(n.getFullYear(),n.getMonth(),d);if(x<s)x=new Date(n.getFullYear(),n.getMonth()+1,d);return[x,Math.round((x-s)/864e5)]};
+const bud=(b,mo)=>{const c=cat(b.categoryId),sp=sum(T().filter(t=>t.tipe=='pengeluaran'&&t.categoryId==b.categoryId&&t.tanggal.startsWith(mo)),t=>t.nominal),p=pc(sp,b.limitBulanan);return`<div style="margin:8px 0"><div class="row" style="border:0;padding:0"><span>${c?.ikon||''} ${esc(c?.nama||'?')}</span><span class="mu">${rp(sp)} / ${rp(b.limitBulanan)}</span></div><div class="bar"><i style="width:${p}%;background:${p>=100?'#EF4444':p>=80?'#F59E0B':'var(--g)'}"></i></div></div>`};
+
+const PG={
+dash(){const mo=today().slice(0,7),ts=T().filter(t=>t.tanggal.startsWith(mo)),sw=sum(myW(),w=>w.saldo),st=sum(mySav(),s=>s.terkumpul),inn=sum(ts.filter(t=>t.tipe=='pemasukan'),t=>t.nominal),out=sum(ts.filter(t=>t.tipe=='pengeluaran'),t=>t.nominal),
+ due=D.recurring.filter(r=>r.aktif&&+r.tanggalBerulang<=+today().slice(8)&&r.terakhirDicatat!=mo),bills=D.debts.filter(d=>d.sisaHutang>0).map(d=>({d,x:nextDue(d.tglJatuhTempo)})).sort((a,b)=>a.x[1]-b.x[1]).slice(0,3),A3=S.u.role!='anak';
+ return hd('Halo, '+esc(S.u.nama),btn(S.hide?'👁️ Tampilkan':'🙈 Sembunyikan',"A.set('hide',!S.hide)",'o')+' '+btn('+ Catat','A.add()'))+
+ `<div class="c hero"><small>Dana Siap Pakai (Tunai · Bank · E-Wallet)</small><div class="big">${m(sw)}</div><small>Pemasukan bulan ini <b>${m(inn)}</b> · Pengeluaran <b>${m(out)}</b></small></div>
+ <div class="g" style="margin-bottom:16px"><div class="c"><div class="mu">🐷 Total Tabungan (terpisah)</div><div class="big">${m(st)}</div></div><div class="c"><div class="mu">Total Aset</div><div class="big">${m(sw+st)}</div></div>${A3?`<div class="c"><div class="mu">Sisa Hutang</div><div class="big out">${m(sum(D.debts,d=>d.sisaHutang))}</div></div><div class="c"><div class="mu">Sisa Piutang</div><div class="big in">${m(sum(D.receivables,r=>r.nominal-r.terbayar))}</div></div>`:''}</div>
+ ${D.quickEntries.length?`<div class="c"><b>Transaksi cepat</b><div style="margin-top:8px">${D.quickEntries.map(q=>`<span class="pill" onclick="A.quick('${q.id}')">${esc(q.judul)} ${rp(q.nominal)}</span>`).join('')}</div></div>`:''}
+ ${due.length?`<div class="c"><b>Perlu dicatat</b>${due.map(r=>`<div class="row"><span>${esc(r.judul)} · ${rp(r.nominal)}</span>${btn('Catat',`A.rec('${r.id}')`)}</div>`).join('')}</div>`:''}
+ ${A3&&bills.length?`<div class="c"><b>Tagihan terdekat</b>${bills.map(({d,x})=>`<div class="row"><span>💳 ${esc(d.nama)}</span><span class="${x[1]<=3?'out':'mu'}">${x[1]} hari · ${rp(d.angsuranPerBulan)}</span></div>`).join('')}</div>`:''}
+ ${D.budgets.length?`<div class="c"><b>Anggaran bulan ini</b>${D.budgets.map(b=>bud(b,mo)).join('')}</div>`:''}
+ <div class="c"><b>Transaksi terbaru</b>${T().slice(0,5).map(trxRow).join('')||empty('Belum ada data transaksi')}</div>`},
+trx(){const l=T().filter(t=>t.tanggal.startsWith(S.m)&&(!S.q||((t.catatan||'')+(cat(t.categoryId)?.nama||'')).toLowerCase().includes(S.q)));
+ return hd('Riwayat Transaksi',btn('+ Pengeluaran',"A.trx('pengeluaran')")+' '+btn('+ Pemasukan',"A.trx('pemasukan')",'o')+' '+btn('Lainnya','A.add()','o'))+`<div class="c"><div class="g" style="margin-bottom:8px"><input type="month" value="${S.m}" onchange="A.set('m',this.value)"><input placeholder="Cari catatan / kategori" value="${esc(S.q)}" onchange="A.set('q',this.value.toLowerCase())"></div>${l.map(trxRow).join('')||empty('Belum ada transaksi di bulan ini')}</div>`},
+debt(){return hd('Kewajiban',kw()+btn('+ Hutang',"A.edit('debts')"))+(D.debts.map(d=>`<div class="c"><div class="row" style="border:0"><div><b>💳 ${esc(d.nama)}</b><div class="mu">${esc(d.kreditur||'')} · jatuh tempo tgl ${d.tglJatuhTempo}</div></div><b class="${d.sisaHutang>0?'out':'in'}">${d.sisaHutang>0?rp(d.sisaHutang):'Lunas'}</b></div><div class="bar"><i style="width:${pc(d.terbayarKe,d.tenor)}%"></i></div><div class="mu">${d.terbayarKe}/${d.tenor} bulan · ${rp(d.angsuranPerBulan)}/bln · bunga ${rp(d.totalBunga)} (${d.bungaFlatPerTahun}%/thn)</div><div style="margin-top:10px">${d.sisaHutang>0?btn('Bayar angsuran',`A.pay('debts','${d.id}')`)+' ':''}${btn('Ubah',`A.edit('debts','${d.id}')`,'o')}${isA()?' '+btn('Hapus',`A.del('debts','${d.id}')`,'o r'):''}</div></div>`).join('')||empty('Belum ada hutang'))},
+rec(){return hd('Kewajiban',kw()+btn('+ Piutang',"A.edit('receivables')"))+(D.receivables.map(r=>{const s=r.nominal-r.terbayar;return`<div class="c"><div class="row" style="border:0"><div><b>🤝 ${esc(r.peminjam)}</b><div class="mu">${esc(r.keterangan||'')} · jatuh tempo ${r.jatuhTempo||'-'}</div></div><b class="${s>0?'in':'mu'}">${s>0?rp(s):'Lunas'}</b></div><div class="bar"><i style="width:${pc(r.terbayar,r.nominal)}%"></i></div><div class="mu">Terbayar ${rp(r.terbayar)} dari ${rp(r.nominal)}</div><div style="margin-top:10px">${s>0?btn('Terima cicilan',`A.pay('receivables','${r.id}')`)+' ':''}${btn('Ubah',`A.edit('receivables','${r.id}')`,'o')}${isA()?' '+btn('Hapus',`A.del('receivables','${r.id}')`,'o r'):''}</div></div>`}).join('')||empty('Belum ada piutang'))},
+sav(){const avg=sum(T().filter(t=>t.tipe=='pengeluaran'&&t.tanggal>=new Date(Date.now()-90*864e5).toISOString().slice(0,10)),t=>t.nominal)/3;
+ return hd('Tabungan (terpisah dari dompet)',S.u.role!='anak'?btn('+ Tabungan',"A.edit('savings')"):'')+(mySav().map(s=>`<div class="c"><div class="row" style="border:0"><div><b>🐷 ${esc(s.nama)}</b><div class="mu">${esc(s.disimpanDi||'')} ${s.deadline?'· tenggat '+s.deadline:''}</div></div><b>${rp(s.terkumpul)}</b></div>${s.target?`<div class="bar"><i style="width:${pc(s.terkumpul,s.target)}%"></i></div><div class="mu">${pc(s.terkumpul,s.target)}% dari ${rp(s.target)}</div>`:''}${s.jenis=='darurat'&&avg?`<div class="mu">Cukup untuk <b>${(s.terkumpul/avg).toFixed(1)} bulan</b> pengeluaran rata-rata (${rp(avg)}/bln)</div>`:''}<div style="margin-top:10px">${btn('Setor',`A.trx('setor_tabungan','',{savingId:'${s.id}'})`)} ${btn('Tarik',`A.trx('tarik_tabungan','',{savingId:'${s.id}'})`,'o')}${S.u.role!='anak'?' '+btn('Ubah',`A.edit('savings','${s.id}')`,'o'):''}${isA()?' '+btn('Hapus',`A.del('savings','${s.id}')`,'o r'):''}</div></div>`).join('')||empty('Belum ada tabungan'))},
+wal(){return hd('Dompet & Rekening',isA()?btn('+ Dompet',"A.edit('wallets')"):'')+`<div class="c">${myW().map(w=>`<div class="row"><div>${{tunai:'💵',bank:'🏦',ewallet:'📱'}[w.tipe]} <b>${esc(w.nama)}</b><div class="mu">${w.ownerId?'Pribadi':'Bersama'}</div></div><div style="text-align:right"><b>${m(w.saldo)}</b><div>${btn('Koreksi',`A.kor('${w.id}')`,'o')}${isA()?' '+btn('Ubah',`A.edit('wallets','${w.id}')`,'o')+' '+btn('Hapus',`A.del('wallets','${w.id}')`,'o r'):''}</div></div></div>`).join('')||empty('Belum ada dompet')}</div>`},
+cal(){const tabs=`<span class="pill ${S.ct=='cal'?'on':''}" onclick="A.set('ct','cal')">Kalender</span><span class="pill ${S.ct=='kal'?'on':''}" onclick="A.set('ct','kal')">Kalkulator</span>`;
+ if(S.ct=='kal'){const F={kredit:[['n','Nama barang','text'],['h','Harga / OTR (Rp)'],['d','Uang muka / DP (Rp)'],['a','Angsuran per bulan (Rp)'],['t','Tenor (bulan)']],bunga:[['h','Pokok pinjaman (Rp)'],['r','Bunga per tahun (%)'],['t','Tenor (bulan)']],lunas:[['h','Sisa pokok (Rp)'],['r','Bunga efektif per tahun (%)'],['a','Angsuran per bulan (Rp)'],['x','Tambahan bayar per bulan (Rp)']]};
+  setTimeout(A.calc);return hd('Kalender & Kalkulator')+tabs+`<div style="margin:8px 0">${[['kredit','Kredit Barang & DP'],['bunga','Bunga Flat & Efektif'],['lunas','Pelunasan Dipercepat']].map(([k,l])=>`<span class="pill ${S.cc==k?'on':''}" onclick="A.set('cc','${k}')">${l}</span>`).join('')}</div><div class="g"><div class="c"><b>Input</b><div style="margin-top:8px">${F[S.cc].map(([i,l,t])=>`<label>${l}</label><input id="${i}" type="${t||'number'}" ${t?'':'inputmode="decimal"'} oninput="A.calc()">`).join('')}</div></div><div class="c hero" style="background:#fff;color:var(--t);border:1px solid var(--bd)"><b>Hasil</b><div id="cr" style="margin-top:8px"></div></div></div>`}
+ const[y,mo]=S.cm.split('-').map(Number),nd=new Date(y,mo,0).getDate(),off=new Date(y,mo-1,1).getDay(),it=[],pd=d=>`${S.cm}-${String(Math.min(+d,nd)).padStart(2,'0')}`;
+ if(S.u.role!='anak'){D.debts.filter(d=>d.sisaHutang>0).forEach(d=>it.push([pd(d.tglJatuhTempo),`💳 Angsuran ${esc(d.nama)} · ${rp(d.angsuranPerBulan)}`]));D.receivables.filter(r=>r.jatuhTempo?.startsWith(S.cm)&&r.nominal>r.terbayar).forEach(r=>it.push([r.jatuhTempo,`🤝 Piutang ${esc(r.peminjam)}`]))}
+ D.recurring.filter(r=>r.aktif).forEach(r=>it.push([pd(r.tanggalBerulang),`🔁 ${esc(r.judul)} · ${rp(r.nominal)}`]));D.events.filter(e=>e.tanggal?.startsWith(S.cm)).forEach(e=>it.push([e.tanggal,`📌 ${esc(e.judul)}${isA()?' '+btn('✕',`A.del('events','${e.id}')`,'o r'):''}`]));it.sort();
+ const days=['M','S','S','R','K','J','S'].map(d=>`<div class="mu">${d}</div>`).join('')+'<div></div>'.repeat(off)+Array.from({length:nd},(_,i)=>`<div class="${it.some(x=>x[0]==pd(i+1))?'d':''}">${i+1}</div>`).join('');
+ const nv=k=>{const d=new Date(y,mo-1+k,1);return d.toISOString().slice(0,7).replace(/^(\d{4}-\d{2}).*/,'$1')};
+ return hd('Kalender & Kalkulator',btn('+ Pengingat',"A.edit('events')"))+tabs+`<div class="c" style="margin-top:8px"><div class="row" style="border:0">${btn('◀',`A.set('cm','${new Date(Date.UTC(y,mo-2,1)).toISOString().slice(0,7)}')`,'o')}<b>${S.cm}</b>${btn('▶',`A.set('cm','${new Date(Date.UTC(y,mo,1)).toISOString().slice(0,7)}')`,'o')}</div><div class="cal">${days}</div></div><div class="c">${it.map(x=>`<div class="row"><span>${x[1]}</span><span class="mu">${x[0].slice(8)}</span></div>`).join('')||empty('Tidak ada agenda bulan ini')}</div>`},
+rep(){const tabs=`<span class="pill ${S.rt=='lap'?'on':''}" onclick="A.set('rt','lap')">Laporan</span><span class="pill ${S.rt=='set'?'on':''}" onclick="A.set('rt','set')">Pengaturan</span>`;
+ if(S.rt=='lap'){const ts=T().filter(t=>t.tanggal.startsWith(S.m)),inn=sum(ts.filter(t=>t.tipe=='pemasukan'),t=>t.nominal),out=sum(ts.filter(t=>t.tipe=='pengeluaran'),t=>t.nominal),by={};ts.filter(t=>t.tipe=='pengeluaran').forEach(t=>{const k=cat(t.categoryId)?.nama||'Lainnya / cicilan';by[k]=(by[k]||0)+t.nominal});
+  return hd('Laporan & Pengaturan',isA()?btn('Ekspor CSV','A.csv()','o')+' '+btn('Backup JSON','A.bak()','o'):'')+tabs+`<div class="c" style="margin-top:8px"><input type="month" value="${S.m}" onchange="A.set('m',this.value)"><div class="g"><div><div class="mu">Pemasukan</div><div class="big in">${rp(inn)}</div></div><div><div class="mu">Pengeluaran</div><div class="big out">${rp(out)}</div></div><div><div class="mu">Selisih</div><div class="big">${rp(inn-out)}</div></div></div><div class="mu">Setoran ke tabungan dan transfer tidak dihitung sebagai pengeluaran.</div></div><div class="c"><b>Pengeluaran per kategori</b>${Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="margin:8px 0"><div class="row" style="border:0;padding:0"><span>${esc(k)}</span><b>${rp(v)}</b></div><div class="bar"><i style="width:${pc(v,out)}%"></i></div></div>`).join('')||empty('Belum ada pengeluaran')}</div>`}
+ if(!isA())return hd('Laporan & Pengaturan')+tabs+`<div class="c" style="margin-top:8px"><div class="row"><span>👤 ${esc(S.u.nama)} (${S.u.role})</span>${btn('Ganti password','A.pw()')}</div></div>`;
+ const P={users:['Anggota',u=>`${esc(u.nama)} <span class="mu">@${u.id} · ${u.role}${u.aktif?'':' · nonaktif'}</span>`],categories:['Kategori',x=>`${x.ikon||''} ${esc(x.nama)} <span class="mu">${x.tipe}</span>`],budgets:['Anggaran',x=>`${esc(cat(x.categoryId)?.nama||'?')} <span class="mu">${rp(x.limitBulanan)}</span>`],recurring:['Berulang',x=>`${esc(x.judul)} <span class="mu">tgl ${x.tanggalBerulang} · ${rp(x.nominal)}</span>`],quickEntries:['Cepat',x=>`${esc(x.judul)} <span class="mu">${rp(x.nominal)}</span>`],activityLogs:['Log'],data:['Data']};
+ const pt=P[S.pt]?S.pt:'users',L=pt=='data'?`<div class="row"><span>Hitung ulang semua saldo dari riwayat transaksi</span>${btn('Jalankan','A.recalc()')}</div>`:pt=='activityLogs'?[...D.activityLogs].sort((a,b)=>b.waktu.localeCompare(a.waktu)).slice(0,60).map(l=>`<div class="row"><span>${esc(l.aksi)}<div class="mu">${esc(l.oleh)} · ${l.waktu.slice(0,16).replace('T',' ')}</div></span></div>`).join('')||empty('Belum ada aktivitas'):D[pt].map(x=>`<div class="row"><div>${P[pt][1](x)}</div><div>${btn('Ubah',pt=='users'?`A.user('${x.id}')`:`A.edit('${pt}','${x.id}')`,'o')} ${btn('Hapus',`A.del('${pt}','${x.id}')`,'o r')}</div></div>`).join('')||empty('Belum ada data')+(pt=='categories'?`<div style="text-align:center">${btn('Buat kategori standar','A.seed()')}</div>`:'');
+ return hd('Laporan & Pengaturan')+tabs+`<div style="margin:8px 0">${Object.entries(P).map(([k,v])=>`<span class="pill ${pt==k?'on':''}" onclick="A.set('pt','${k}')">${v[0]}</span>`).join('')}</div><div class="c">${['data','activityLogs'].includes(pt)?'':`<div style="text-align:right;margin-bottom:6px">${btn('+ Tambah',pt=='users'?'A.user()':`A.edit('${pt}')`)}</div>`}${L}</div>`}};
+
+function render(){const a=$('#app');if(!S.u){S.u=null;a.innerHTML=`<div class="lw"><div class="c"><div style="text-align:center;margin-bottom:14px"><div style="width:72px;margin:auto">${ICON}</div><h2 style="font-size:26px;font-weight:800">Si<span style="color:var(--g)">Catat</span></h2><div class="mu">Catat uang keluarga, tenang setiap hari</div></div>
+ <div style="text-align:center"><span class="pill ${S.lm=='admin'?'on':''}" onclick="A.set('lm','admin')">Admin</span><span class="pill ${S.lm!='admin'?'on':''}" onclick="A.set('lm','anggota')">Anggota Keluarga</span></div>
+ <form onsubmit="A.login(event)"><label>${S.lm=='admin'?'Email':'Username'}</label><input name="u" required autocomplete="username"><label>Password</label><input name="p" type="password" required autocomplete="current-password"><button class="b" style="width:100%">Masuk</button></form>
+ ${IS_PREVIEW?'<div class="mu" style="margin-top:12px;background:#FFF8E6;padding:10px;border-radius:12px">MODE PREVIEW (data sementara). Admin: admin@sicatat.id / admin123 · Anggota: ibu / ibu12345 · adi / adi12345</div>':''}</div></div>`;return}
+ if(S.p=='cal'&&S.ct=='kal'&&document.activeElement?.closest('#main'))return;
+ const mn=menu(),bn=[['dash','🏠','Beranda'],['trx','🧾','Transaksi']],b2=S.u.role=='anak'?['sav','🐷','Tabungan']:['debt','💳','Kewajiban'];
+ a.innerHTML=`<aside id="side"><div class="lg">${ICON}<span>Si<b>Catat</b></span></div><div class="nav" style="flex:1">${mn.map(([p,i,l])=>`<a class="${S.p==p?'on':''}" onclick="A.go('${p}')">${i} ${l}</a>`).join('')}</div><div style="padding:12px;background:#0F3D33;border-radius:16px;color:#fff"><b>${esc(S.u.nama)}</b><div class="mu" style="color:#9FB8B0">${S.u.role}</div><a style="cursor:pointer;color:#34D399" onclick="A.out()">Keluar akun</a></div></aside>
+ <main id="main">${(PG[S.p]||PG.dash)()}</main><nav id="bn">${bn.map(([p,i,l])=>`<a class="${S.p==p?'on':''}" onclick="A.go('${p}')"><span>${i}</span>${l}</a>`).join('')}<a class="fab" onclick="A.add()">＋</a><a class="${S.p==b2[0]||S.p=='rec'?'on':''}" onclick="A.go('${b2[0]}')"><span>${b2[1]}</span>${b2[2]}</a><a onclick="A.menu()"><span>☰</span>Menu</a></nav>`}
+
+function start(u){S.u=u;S.p='dash';if(!IS_PREVIEW)listen();render()}
+function listen(){COLS.forEach(c=>{if((c=='users'||c=='activityLogs')&&!isA())return;const q=c=='transactions'?FB.query(FB.collection(FB.db,c),FB.where('tanggal','>=',new Date(Date.now()-366*864e5).toISOString().slice(0,10)),FB.orderBy('tanggal','desc')):FB.collection(FB.db,c);
+ FB.onSnapshot(q,s=>{D[c]=s.docs.map(d=>({...d.data(),id:d.id}));render()},()=>{})})}
+
+(async()=>{
+ if(IS_PREVIEW){const mk=async(id,nama,role,pw)=>{const salt=uid();return{id,nama,role,aktif:true,salt,passHash:await hp(pw,salt)}};
+  D.users=[await mk('ibu','Ibu','dewasa','ibu12345'),await mk('adi','Adi','anak','adi12345')];
+  D.wallets=[{id:'w1',nama:'Tunai',tipe:'tunai',saldoAwal:500000,saldo:450000,aktif:true,ownerId:''},{id:'w2',nama:'Bank BCA',tipe:'bank',saldoAwal:5000000,saldo:5000000,aktif:true,ownerId:''}];
+  D.categories=[{id:'c1',nama:'Gaji',tipe:'pemasukan',ikon:'💼'},{id:'c2',nama:'Makan',tipe:'pengeluaran',ikon:'🍽️'}];
+  D.transactions=[{id:'t1',tipe:'pengeluaran',nominal:50000,tanggal:today(),walletId:'w1',categoryId:'c2',catatan:'Makan siang',createdBy:'admin',createdByNama:'Ayah (Admin)'}];
+  D.budgets=[{id:'c2',categoryId:'c2',limitBulanan:1500000}];D.savings=[{id:'s1',nama:'Dana Darurat',jenis:'darurat',target:10000000,terkumpul:2000000,shared:true,ownerId:'admin',disimpanDi:'Rekening terpisah'}];
+  D.debts=[{id:'d1',nama:'Vario 125 CBS',kreditur:'FIF',jenis:'kredit_barang',hargaBarang:25420000,dp:700000,pokok:24720000,angsuranPerBulan:990000,tenor:35,totalBayar:35350000,totalBunga:9930000,bungaFlatPerTahun:13.77,terbayarKe:3,sisaHutang:31680000,tglJatuhTempo:15}];
+  D.receivables=[{id:'r1',peminjam:'Budi',keterangan:'Pinjaman pribadi',nominal:1000000,terbayar:0,jatuhTempo:today()}];
+  D.quickEntries=[{id:'q1',judul:'Bensin',tipe:'pengeluaran',nominal:20000,categoryId:'c2',walletId:'w1'}];render();return}
+ try{const v='10.12.2',u=n=>import(`https://www.gstatic.com/firebasejs/${v}/firebase-${n}.js`),[ap,au,fs]=await Promise.all([u('app'),u('auth'),u('firestore')]),app=ap.initializeApp(firebaseConfig);
+  FB={...fs,db:fs.getFirestore(app),auth:au.getAuth(app),signIn:au.signInWithEmailAndPassword,signOut:au.signOut,inc:0,increment:fs.increment};
+  au.onAuthStateChanged(FB.auth,async x=>{if(x)return start({nama:x.email,role:'admin'});let ok=0;const t=localStorage.getItem('sicatat_session');
+   if(t){try{const s=await FB.getDoc(FB.doc(FB.db,'sessions',t)),d=s.data();if(s.exists()&&d.expiresAt>Date.now()){S.tok=t;ok=1;start({id:d.userId,nama:d.nama,role:d.role})}else localStorage.removeItem('sicatat_session')}catch(e){}}
+   if(!ok){S.u=null;render()}})}catch(e){document.body.innerHTML='<p style="padding:20px">Gagal terhubung ke Firebase. Periksa firebaseConfig.</p>'}})();
+</script></body></html>
